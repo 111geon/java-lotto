@@ -1,17 +1,15 @@
 package app.view;
 
-import app.model.Price;
+import app.model.LotteryTicketConst;
 
 import java.util.Scanner;
 
 enum NumTicket {
     MIN(1), MAX(1000);
     private final int value;
-
     NumTicket(int value) {
         this.value = value;
     }
-
     public int getValue() {
         return value;
     }
@@ -45,8 +43,8 @@ public class Receiver {
     }
 
     private static void validateMoney(int money) {
-        int minMoney = Price.LOTTERY_TICKET.getValue() * NumTicket.MIN.getValue();
-        int maxMoney = Price.LOTTERY_TICKET.getValue() * NumTicket.MAX.getValue();
+        int minMoney = LotteryTicketConst.PRICE.getValue() * NumTicket.MIN.getValue();
+        int maxMoney = LotteryTicketConst.PRICE.getValue() * NumTicket.MAX.getValue();
 
         if(money < minMoney) {
             throw new InputMoneyException("최소 구입 금액은 " + minMoney + "원 입니다.");
