@@ -2,7 +2,7 @@ package app.view;
 
 import app.model.LotteryTicketConst;
 
-import java.util.Scanner;
+import java.util.*;
 
 enum NumTicket {
     MIN(1), MAX(1000);
@@ -15,31 +15,75 @@ enum NumTicket {
     }
 }
 
+enum Input {
+    MONEY_INPUT("구입금액"), WINNING_NUMBER("당첨번호"), BONUS_NUMBER("보너스번호");
+    private final String value;
+    Input(String value) {
+        this.value = value;
+    }
+    public String getValue() {
+        return value;
+    }
+}
+
 public class Receiver {
     private static Scanner sc = new Scanner(System.in);
 
     public static int askMoney() {
         System.out.println("구입금액을 입력해 주세요.");
-
-        String moneyInput = sc.nextLine();
         int money;
 
         try {
-            money = parseMoney(moneyInput);
+            money = parseStringToInt(sc.nextLine(), Input.MONEY_INPUT);
             validateMoney(money);
             return money;
-        } catch(InputMoneyException error) {
+        } catch(InputException error) {
             System.err.println(error.getMessage());
             return askMoney();
         }
     }
 
-    private static int parseMoney(String moneyInput) {
+    public static List<Integer> askWinningNumbers() {
+        System.out.println(System.lineSeparator() + "지난 주 당첨 번호를 입력해 주세요.");
+        List<String> winningNumbersInput = Arrays.asList(sc.nextLine().split(","));
         try {
-            return Integer.parseInt(moneyInput);
-        } catch(java.lang.NumberFormatException error) {
-            throw new InputMoneyException("구입 금액은 Integer이어야 합니다.");
+            List<Integer> winningNumbers = parseStringListToIntList(winningNumbersInput);
+            validateWinningNumbers(winningNumbers);
+            return winningNumbers;
+        } catch(InputException error) {
+            System.err.println(error.getMessage());
+            return askWinningNumbers();
         }
+    }
+
+    public static int askBonusNumber(List<Integer> winningNumbers) {
+        System.out.println("보너스 볼을 입력해 주세요.");
+        int bonusNumber;
+
+        try {
+            bonusNumber = parseStringToInt(sc.nextLine(), Input.BONUS_NUMBER);
+            validateBonusNumbers(bonusNumber, winningNumbers);
+            return bonusNumber;
+        } catch(InputException error) {
+            System.err.println(error.getMessage());
+            return askBonusNumber(winningNumbers);
+        }
+    }
+
+    private static int parseStringToInt(String string, Input input) {
+        try {
+            return Integer.parseInt(string.strip());
+        } catch(java.lang.NumberFormatException error) {
+            throw new InputException(input.getValue() + "은(는) Integer이어야 합니다.");
+        }
+    }
+
+    private static List<Integer> parseStringListToIntList(List<String> stringList) {
+        List<Integer> intList = new ArrayList<>();
+        for(String string: stringList) {
+            intList.add(parseStringToInt(string, Input.WINNING_NUMBER));
+        }
+        return intList;
     }
 
     private static void validateMoney(int money) {
@@ -47,16 +91,46 @@ public class Receiver {
         int maxMoney = LotteryTicketConst.PRICE.getValue() * NumTicket.MAX.getValue();
 
         if(money < minMoney) {
-            throw new InputMoneyException("최소 구입 금액은 " + minMoney + "원 입니다.");
+            throw new InputException("최소 구입 금액은 " + minMoney + "원 입니다.");
         }
 
         if(money > maxMoney) {
-            throw new InputMoneyException("최대 구입 금액은 " + maxMoney + "원 입니다.");
+            throw new InputException("최대 구입 금액은 " + maxMoney + "원 입니다.");
         }
     }
 
-    private static class InputMoneyException extends RuntimeException {
-        public InputMoneyException(String message) {
+    private static void validateLotteryNumber(int lotteryNumber) {
+        if(lotteryNumber < LotteryTicketConst.MIN_NUM.getValue() ||
+                lotteryNumber > LotteryTicketConst.MAX_NUM.getValue()) {
+            throw new InputException("당첨 번호는 " + LotteryTicketConst.MIN_NUM.getValue() + "이상 " +
+                    LotteryTicketConst.MAX_NUM.getValue() + "이하입니다.");
+        }
+    }
+
+    private static void validateWinningNumbers(List<Integer> winningNumbers) {
+        for(int winningNumber: winningNumbers) {
+            validateLotteryNumber(winningNumber);
+        }
+
+        if(winningNumbers.size() != LotteryTicketConst.NUM_NUMS.getValue()) {
+            throw new InputException("당첨 번호의 갯수는 " + LotteryTicketConst.NUM_NUMS.getValue() + "개 입니다.");
+        }
+
+        if(winningNumbers.size() != new HashSet<>(winningNumbers).size()) {
+            throw new InputException("당첨 번호는 중복될 수 없습니다.");
+        }
+    }
+
+    private static void validateBonusNumbers(int bonusNumber, List<Integer> winningNumbers) {
+        validateLotteryNumber(bonusNumber);
+
+        if(winningNumbers.contains(bonusNumber)) {
+            throw new InputException("보너스 번호는 당첨 번호와 중복될 수 없습니다.");
+        }
+    }
+
+    private static class InputException extends RuntimeException {
+        public InputException(String message) {
             super(message);
         }
     }
