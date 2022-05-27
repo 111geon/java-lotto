@@ -1,6 +1,7 @@
 package app.view;
 
 import app.model.LotteryTicketConst;
+import app.model.LotteryTicketNumbers;
 
 import java.util.*;
 
@@ -48,7 +49,7 @@ public class Receiver {
         List<String> winningNumbersInput = Arrays.asList(sc.nextLine().split(","));
         try {
             List<Integer> winningNumbers = parseStringListToIntList(winningNumbersInput);
-            validateWinningNumbers(winningNumbers);
+            LotteryTicketNumbers.validateLotteryNumbers(winningNumbers);
             return winningNumbers;
         } catch(InputException error) {
             System.err.println(error.getMessage());
@@ -99,30 +100,8 @@ public class Receiver {
         }
     }
 
-    private static void validateLotteryNumber(int lotteryNumber) {
-        if(lotteryNumber < LotteryTicketConst.MIN_NUM.getValue() ||
-                lotteryNumber > LotteryTicketConst.MAX_NUM.getValue()) {
-            throw new InputException("당첨 번호는 " + LotteryTicketConst.MIN_NUM.getValue() + "이상 " +
-                    LotteryTicketConst.MAX_NUM.getValue() + "이하입니다.");
-        }
-    }
-
-    private static void validateWinningNumbers(List<Integer> winningNumbers) {
-        for(int winningNumber: winningNumbers) {
-            validateLotteryNumber(winningNumber);
-        }
-
-        if(winningNumbers.size() != LotteryTicketConst.NUM_NUMS.getValue()) {
-            throw new InputException("당첨 번호의 갯수는 " + LotteryTicketConst.NUM_NUMS.getValue() + "개 입니다.");
-        }
-
-        if(winningNumbers.size() != new HashSet<>(winningNumbers).size()) {
-            throw new InputException("당첨 번호는 중복될 수 없습니다.");
-        }
-    }
-
     private static void validateBonusNumbers(int bonusNumber, List<Integer> winningNumbers) {
-        validateLotteryNumber(bonusNumber);
+        LotteryTicketNumbers.validateLotteryNumber(bonusNumber);
 
         if(winningNumbers.contains(bonusNumber)) {
             throw new InputException("보너스 번호는 당첨 번호와 중복될 수 없습니다.");

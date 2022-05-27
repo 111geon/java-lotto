@@ -1,6 +1,7 @@
 package app.controller;
 
 import app.model.LotteryTickets;
+import app.model.Winners;
 import app.view.Receiver;
 import app.view.Viewer;
 
@@ -14,11 +15,20 @@ public class Lotto {
     }
 
     public void play() {
+        setLotto();
+        doLotto();
+    }
+
+    private void setLotto() {
         int money = Receiver.askMoney();
-        lotteryTickets.generateTickets(money);
+        lotteryTickets.setLotteryTickets(money);
         Viewer.printLotteryTickets(lotteryTickets);
+    }
+
+    private void doLotto() {
         List<Integer> winningNumbers = Receiver.askWinningNumbers();
         int bonusNumber = Receiver.askBonusNumber(winningNumbers);
-        System.out.println(winningNumbers);
+        Winners winners = lotteryTickets.getWinners(winningNumbers, bonusNumber);
+        Viewer.printStatistics(winners, winners.calculateProfit());
     }
 }
