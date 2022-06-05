@@ -1,33 +1,24 @@
 package app.model;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LotteryTicket {
-    private final LotteryTicketNumbers lotteryTicketNumbers;
+    private final LotteryNumbers lotteryNumbers;
 
-    public LotteryTicket(LotteryTicketNumbers lotteryTicketNumbers) {
-        this.lotteryTicketNumbers = lotteryTicketNumbers;
+    public LotteryTicket(LotteryNumbers lotteryNumbers) {
+        this.lotteryNumbers = lotteryNumbers;
     }
 
-    List<Integer> getNumberList() {
-        return lotteryTicketNumbers.getNumbers();
+    List<Integer> getNumbers() {
+        return lotteryNumbers.getLotteryNumbers().stream()
+                .map(LotteryNumber::getNumber)
+                .collect(Collectors.toList());
     }
 
-    Winner getWinner(List<Integer> winningNumbers, int bonusNumber) {
-        int numWinningNumbers = 0;
-
-        for(Integer winningNumber: winningNumbers) {
-            numWinningNumbers = increaseNum(numWinningNumbers, lotteryTicketNumbers.containNumber(winningNumber));
-        }
-
-        boolean hasBonus = lotteryTicketNumbers.containNumber(bonusNumber);
-        return Winner.getWinner(numWinningNumbers, hasBonus);
-    }
-
-    private int increaseNum(int num, boolean isTrue) {
-        if(isTrue) {
-            num += 1;
-        }
-        return num;
+    Winner getWinner(WinningNumbers winningNumbers) {
+        int numMatchBase = winningNumbers.numMatchBase(lotteryNumbers);
+        boolean hasBonus = winningNumbers.hasBonus(lotteryNumbers);
+        return Winner.findWinner(numMatchBase, hasBonus);
     }
 }

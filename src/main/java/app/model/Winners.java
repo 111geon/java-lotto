@@ -1,6 +1,7 @@
 package app.model;
 
 import java.util.Map;
+import java.util.Set;
 
 public class Winners {
     private final Map<Winner, Integer> winners;
@@ -9,17 +10,17 @@ public class Winners {
         this.winners = winners;
     }
 
-    public Map<Winner, Integer> getWinners() {
-        return winners;
+    public Set<Map.Entry<Winner, Integer>> getEntrySet() {
+        return winners.entrySet();
     }
 
-    public float calculateProfit() {
-        int totalPrizeMoney = 0;
-        int totalTicketMoney = 0;
-        for(Map.Entry<Winner, Integer> winner: winners.entrySet()) {
-            totalTicketMoney += LotteryTicketConst.PRICE.getValue() * winner.getValue();
-            totalPrizeMoney += winner.getKey().getPrizeMoney() * winner.getValue();
+    public float calculateProfitRate() {
+        int totalProfit = 0;
+        int totalInvest = 0;
+        for(Map.Entry<Winner, Integer> winnerEntry: winners.entrySet()) {
+            totalProfit += winnerEntry.getKey().getPrizeMoney() * winnerEntry.getValue();
+            totalInvest += Money.getTicketPrice() * winnerEntry.getValue();
         }
-        return (float)totalPrizeMoney / (float)totalTicketMoney;
+        return totalProfit / (float)totalInvest;
     }
 }

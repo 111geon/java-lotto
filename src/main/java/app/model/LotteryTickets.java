@@ -1,18 +1,18 @@
 package app.model;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class LotteryTickets {
     private List<LotteryTicket> lotteryTickets = new ArrayList<>();
 
-    public void setLotteryTickets(int money) {
-        for(int i=money / LotteryTicketConst.PRICE.getValue(); i>0; i--) {
-            LotteryTicketNumbers lotteryTicketNumbers = new LotteryTicketNumbers();
-            lotteryTickets.add(new LotteryTicket(lotteryTicketNumbers));
+    public LotteryTickets(Money money) {
+        for(int i = money.getMoney() / Money.getTicketPrice(); i > 0; i--) {
+            lotteryTickets.add(new LotteryTicket(LotteryNumbers.auto()));
         }
     }
 
-    void setLotteryTickets(List<LotteryTicket> lotteryTickets) {
+    public LotteryTickets(List<LotteryTicket> lotteryTickets) {
         this.lotteryTickets = lotteryTickets;
     }
 
@@ -20,24 +20,22 @@ public class LotteryTickets {
         return lotteryTickets.size();
     }
 
-    public List<List<Integer>> getNumberLists() {
-        List<List<Integer>> numberLists = new ArrayList<>();
-        for(LotteryTicket lotteryTicket: lotteryTickets) {
-            numberLists.add(lotteryTicket.getNumberList());
-        }
-        return numberLists;
+    public List<List<Integer>> getNumbersList() {
+        return lotteryTickets.stream()
+                .map(LotteryTicket::getNumbers)
+                .collect(Collectors.toList());
     }
 
-    public Winners getWinners(List<Integer> winningNumbers, int bonusNumber) {
+    public Winners getWinnersFrom(WinningNumbers winningNumbers) {
         Map<Winner, Integer> winners = new LinkedHashMap<>();
+
         for(Winner winner: Winner.values()) {
             winners.put(winner, 0);
         }
 
         for(LotteryTicket lotteryTicket: lotteryTickets) {
-            Winner winner = lotteryTicket.getWinner(winningNumbers, bonusNumber);
-            int count = winners.get(winner);
-            winners.put(winner, count+1);
+            Winner winner = lotteryTicket.getWinner(winningNumbers);
+            winners.put(winner, winners.get(winner)+1);
         }
 
         return new Winners(winners);

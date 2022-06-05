@@ -1,12 +1,44 @@
 package app.model;
 
+import java.util.Arrays;
+
 public enum Winner {
-    FIFTH(3, false, 5000),
-    FOURTH(4, false, 50000),
-    THIRD(5, false, 1500000),
-    SECOND(5, true, 30000000),
-    FIRST(6, false, 2000000000),
-    NOGO(0, false, 0);
+    FIFTH(3, false, 5000) {
+        @Override
+        public boolean check(int numWinningNumbers, boolean hasBonus) {
+            return numWinningNumbers == getNumWinningNumbers();
+        }
+    },
+    FOURTH(4, false, 50000) {
+        @Override
+        public boolean check(int numWinningNumbers, boolean hasBonus) {
+            return numWinningNumbers == getNumWinningNumbers();
+        }
+    },
+    THIRD(5, false, 1500000) {
+        @Override
+        public boolean check(int numWinningNumbers, boolean hasBonus) {
+            return numWinningNumbers == getNumWinningNumbers() && hasBonus == getNeedBonus();
+        }
+    },
+    SECOND(5, true, 30000000) {
+        @Override
+        public boolean check(int numWinningNumbers, boolean hasBonus) {
+            return numWinningNumbers == getNumWinningNumbers() && hasBonus == getNeedBonus();
+        }
+    },
+    FIRST(6, false, 2000000000) {
+        @Override
+        public boolean check(int numWinningNumbers, boolean hasBonus) {
+            return numWinningNumbers == getNumWinningNumbers();
+        }
+    },
+    NOGO(0, false, 0) {
+        @Override
+        public boolean check(int numWinningNumbers, boolean hasBonus) {
+            return false;
+        }
+    };
 
     private final int numWinningNumbers;
     private final boolean needBonus;
@@ -18,20 +50,25 @@ public enum Winner {
         this.prizeMoney = prizeMoney;
     }
 
+    abstract public boolean check(int numWinningNumbers, boolean hasBonus);
+
     public int getNumWinningNumbers() {
         return numWinningNumbers;
+    }
+
+    public boolean getNeedBonus() {
+        return needBonus;
     }
 
     public int getPrizeMoney() {
         return prizeMoney;
     }
 
-    public static Winner getWinner(int numWinningNumbers, boolean hasBonus) {
-        if(numWinningNumbers == FIRST.numWinningNumbers) { return FIRST; }
-        if(numWinningNumbers == SECOND.numWinningNumbers && hasBonus == SECOND.needBonus) { return SECOND; }
-        if(numWinningNumbers == THIRD.numWinningNumbers) { return THIRD; }
-        if(numWinningNumbers == FOURTH.numWinningNumbers) { return FOURTH; }
-        if(numWinningNumbers == FIFTH.numWinningNumbers) { return FIFTH; }
-        return NOGO;
+
+    static Winner findWinner(int numWinningNumbers, boolean hasBonus) {
+        return Arrays.stream(Winner.values())
+                .filter(winner -> winner.check(numWinningNumbers, hasBonus))
+                .findAny()
+                .orElse(NOGO);
     }
 }

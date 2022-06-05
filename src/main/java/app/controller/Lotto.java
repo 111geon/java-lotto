@@ -1,34 +1,37 @@
 package app.controller;
 
-import app.model.LotteryTickets;
-import app.model.Winners;
+import app.model.*;
 import app.view.Receiver;
 import app.view.Viewer;
 
-import java.util.List;
-
 public class Lotto {
-    private final LotteryTickets lotteryTickets;
-
-    public Lotto(LotteryTickets lotteryTickets) {
-        this.lotteryTickets = lotteryTickets;
-    }
+    private LotteryTickets lotteryTickets;
+    private WinningNumbers winningNumbers;
 
     public void play() {
-        setLotto();
-        doLotto();
+        setLotteryTickets();
+        showLotteryTickets();
+        setWinningNumbers();
+        showResult();
     }
 
-    private void setLotto() {
-        int money = Receiver.askMoney();
-        lotteryTickets.setLotteryTickets(money);
+    private void setLotteryTickets() {
+        Money money = Receiver.askMoney();
+        this.lotteryTickets = new LotteryTickets(money);
+    }
+
+    private void showLotteryTickets() {
         Viewer.printLotteryTickets(lotteryTickets);
     }
 
-    private void doLotto() {
-        List<Integer> winningNumbers = Receiver.askWinningNumbers();
-        int bonusNumber = Receiver.askBonusNumber(winningNumbers);
-        Winners winners = lotteryTickets.getWinners(winningNumbers, bonusNumber);
-        Viewer.printStatistics(winners, winners.calculateProfit());
+    private void setWinningNumbers() {
+        LotteryNumbers winningNumbersBase = Receiver.askWinningNumbersBase();
+        LotteryNumber bonusNumber = Receiver.askBonusNumber(winningNumbersBase);
+        this.winningNumbers = new WinningNumbers(winningNumbersBase, bonusNumber);
+    }
+
+    private void showResult() {
+        Winners winners = lotteryTickets.getWinnersFrom(winningNumbers);
+        Viewer.printStatistics(winners);
     }
 }
