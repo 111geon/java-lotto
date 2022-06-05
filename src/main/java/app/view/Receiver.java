@@ -1,9 +1,6 @@
 package app.view;
 
-import app.model.LotteryNumber;
-import app.model.LotteryNumbers;
-import app.model.Money;
-import app.model.WinningNumbers;
+import app.model.*;
 
 import java.util.*;
 
@@ -12,7 +9,6 @@ public class Receiver {
 
     public static Money askMoney() {
         System.out.println("구입금액을 입력해 주세요.");
-
         try {
             return new Money(parseStringToInt(sc.nextLine()));
         } catch(IllegalArgumentException error) {
@@ -21,10 +17,21 @@ public class Receiver {
         }
     }
 
+    public static Order askOrder(Money money) {
+        int toBuy = askToBuy(money);
+        List<LotteryNumbers> lotteryNumbersList = askLotteryNumbersList(toBuy);
+        try {
+            return new Order(money, toBuy, lotteryNumbersList);
+        } catch (IllegalArgumentException error) {
+            System.err.println(error.getMessage());
+            return askOrder(money);
+        }
+    }
+
     public static LotteryNumbers askWinningNumbersBase() {
         System.out.println(System.lineSeparator() + "지난 주 당첨 번호를 입력해 주세요.");
-        List<String> winningNumbersBaseInput = Arrays.asList(sc.nextLine().split(","));
         try {
+            List<String> winningNumbersBaseInput = Arrays.asList(sc.nextLine().split(","));
             return LotteryNumbers.manual(parseStringListToIntList(winningNumbersBaseInput));
         } catch(IllegalArgumentException error) {
             System.err.println(error.getMessage());
@@ -41,6 +48,38 @@ public class Receiver {
         } catch(IllegalArgumentException error) {
             System.err.println(error.getMessage());
             return askBonusNumber(winningNumbersBase);
+        }
+    }
+
+    private static int askToBuy(Money money) {
+        System.out.println("수동으로 구매할 로또 수를 입력해 주세요.");
+        try {
+            int toBuy = parseStringToInt(sc.nextLine());
+            Order.validateToBuy(money, toBuy);
+            return toBuy;
+        } catch (IllegalArgumentException error) {
+            System.err.println(error.getMessage());
+            return askToBuy(money);
+        }
+    }
+
+    private static List<LotteryNumbers> askLotteryNumbersList(int toBuy) {
+        System.out.println("수동으로 구매할 번호를 입력해 주세요.");
+        List<LotteryNumbers> lotteryNumbersList = new ArrayList<>();
+        try {
+            buildLotteryNumbersList(lotteryNumbersList, toBuy);
+            Order.validateLotteryNumbersList(toBuy, lotteryNumbersList);
+            return lotteryNumbersList;
+        } catch (IllegalArgumentException error) {
+            System.err.println(error.getMessage());
+            return askLotteryNumbersList(toBuy);
+        }
+    }
+
+    private static void buildLotteryNumbersList(List<LotteryNumbers> lotteryNumbersList, int toBuy) {
+        for(int i = toBuy; i > 0; i--) {
+            List<String> lotteryNumbersInput = Arrays.asList(sc.nextLine().split(","));
+            lotteryNumbersList.add(LotteryNumbers.manual(parseStringListToIntList(lotteryNumbersInput)));
         }
     }
 

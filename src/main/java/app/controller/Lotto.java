@@ -5,8 +5,12 @@ import app.view.Receiver;
 import app.view.Viewer;
 
 public class Lotto {
-    private LotteryTickets lotteryTickets;
+    private final LotteryTickets lotteryTickets;
     private WinningNumbers winningNumbers;
+
+    public Lotto(LotteryTickets lotteryTickets) {
+        this.lotteryTickets = lotteryTickets;
+    }
 
     public void play() {
         setLotteryTickets();
@@ -17,7 +21,9 @@ public class Lotto {
 
     private void setLotteryTickets() {
         Money money = Receiver.askMoney();
-        this.lotteryTickets = new LotteryTickets(money);
+        Order order = Receiver.askOrder(money);
+        lotteryTickets.appendManual(order);
+        lotteryTickets.appendAuto(money);
     }
 
     private void showLotteryTickets() {

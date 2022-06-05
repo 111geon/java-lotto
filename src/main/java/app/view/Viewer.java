@@ -7,7 +7,8 @@ import java.util.Map;
 
 public class Viewer {
     public static void printLotteryTickets(LotteryTickets lotteryTickets) {
-        System.out.println(lotteryTickets.size() + "개를 구매했습니다.");
+        System.out.printf("수동으로 " + lotteryTickets.getNumManualTickets() + "개, ");
+        System.out.println("자동으로 " + lotteryTickets.getNumAutoTickets() + "개를 구매했습니다.");
         for(List<Integer> numbers: lotteryTickets.getNumbersList()) {
             System.out.println(numbers);
         }

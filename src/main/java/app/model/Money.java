@@ -6,7 +6,7 @@ public class Money {
     private static final int TICKET_PRICE = 1000;
     private static final int MIN_NUM_TICKET = 1;
     private static final int MAX_NUM_TICKET = 1000;
-    private final int money;
+    private int money;
 
     public Money(int money) {
         validate(money);
@@ -19,6 +19,10 @@ public class Money {
 
     int getMoney() {
         return money;
+    }
+
+    void buyTicket() {
+        money -= TICKET_PRICE;
     }
 
     private void validate(int money) {

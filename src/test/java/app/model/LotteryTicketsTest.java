@@ -14,22 +14,33 @@ class LotteryTicketsTest {
 
     @BeforeAll
     static void setLotteryTickets() {
-        money = new Money(3200);
-        List<LotteryTicket> lotteryTicketList = new ArrayList<>();
-        lotteryTicketList.add(new LotteryTicket(LotteryNumbers.manual(Arrays.asList(1, 2, 3, 4, 5, 6))));
-        lotteryTicketList.add(new LotteryTicket(LotteryNumbers.manual(Arrays.asList(1, 2, 3, 4, 5, 7))));
-        lotteryTicketList.add(new LotteryTicket(LotteryNumbers.manual(Arrays.asList(1, 2, 3, 4, 5, 8))));
-        lotteryTicketList.add(new LotteryTicket(LotteryNumbers.manual(Arrays.asList(1, 2, 3, 4, 7, 8))));
-        lotteryTicketList.add(new LotteryTicket(LotteryNumbers.manual(Arrays.asList(1, 2, 3, 7, 8, 9))));
-        lotteryTicketList.add(new LotteryTicket(LotteryNumbers.manual(Arrays.asList(1, 2, 7, 8, 9, 10))));
-        lotteryTickets = new LotteryTickets(lotteryTicketList);
+        money = new Money(6200);
+        int toBuy = 6;
+        List<LotteryNumbers> lotteryNumbersList = new ArrayList<>();
+        lotteryNumbersList.add(LotteryNumbers.manual(Arrays.asList(1, 2, 3, 4, 5, 6)));
+        lotteryNumbersList.add(LotteryNumbers.manual(Arrays.asList(1, 2, 3, 4, 5, 7)));
+        lotteryNumbersList.add(LotteryNumbers.manual(Arrays.asList(1, 2, 3, 4, 5, 8)));
+        lotteryNumbersList.add(LotteryNumbers.manual(Arrays.asList(1, 2, 3, 4, 7, 8)));
+        lotteryNumbersList.add(LotteryNumbers.manual(Arrays.asList(1, 2, 3, 7, 8, 9)));
+        lotteryNumbersList.add(LotteryNumbers.manual(Arrays.asList(1, 2, 7, 8, 9, 10)));
+        lotteryTickets = new LotteryTickets();
+        Order order = new Order(money, toBuy, lotteryNumbersList);
+        lotteryTickets.appendManual(order);
     }
 
     @Test
-    @DisplayName("money를 입력 받으면 최대한 많은 LotteryTicket을 생성한다.")
-    void generateTickets() {
-        LotteryTickets lotteryTickets = new LotteryTickets(money);
-        assertThat(lotteryTickets.size()).isEqualTo(money.getMoney()/Money.getTicketPrice());
+    @DisplayName("수동으로 구매한 티켓 수 확인")
+    void generateManualTicket() {
+        assertThat(lotteryTickets.getNumManualTickets()).isEqualTo(6);
+    }
+
+    @Test
+    @DisplayName("money를 입력 받으면 최대한 많은 LotteryTicket을 자동으로 생성한다.")
+    void generateAutoTickets() {
+        money = new Money(6000);
+        lotteryTickets = new LotteryTickets();
+        lotteryTickets.appendAuto(money);
+        assertThat(lotteryTickets.getNumAutoTickets()).isEqualTo(6);
     }
 
     @Test

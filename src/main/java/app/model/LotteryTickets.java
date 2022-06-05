@@ -5,25 +5,37 @@ import java.util.stream.Collectors;
 
 public class LotteryTickets {
     private List<LotteryTicket> lotteryTickets = new ArrayList<>();
+    private int numManualTickets = 0;
+    private int numAutoTickets = 0;
 
-    public LotteryTickets(Money money) {
-        for(int i = money.getMoney() / Money.getTicketPrice(); i > 0; i--) {
+    public void appendAuto(Money money) {
+        while(money.getMoney() >= Money.getTicketPrice()) {
             lotteryTickets.add(new LotteryTicket(LotteryNumbers.auto()));
+            money.buyTicket();
+            numAutoTickets += 1;
         }
     }
 
-    public LotteryTickets(List<LotteryTicket> lotteryTickets) {
-        this.lotteryTickets = lotteryTickets;
-    }
-
-    public int size() {
-        return lotteryTickets.size();
+    public void appendManual(Order order) {
+        while(order.getToBuy() > 0) {
+            lotteryTickets.add(new LotteryTicket(order.popLotteryNumbers()));
+            order.buyTicket();
+            numManualTickets += 1;
+        }
     }
 
     public List<List<Integer>> getNumbersList() {
         return lotteryTickets.stream()
                 .map(LotteryTicket::getNumbers)
                 .collect(Collectors.toList());
+    }
+
+    public int getNumManualTickets() {
+        return numManualTickets;
+    }
+
+    public int getNumAutoTickets() {
+        return numAutoTickets;
     }
 
     public Winners getWinnersFrom(WinningNumbers winningNumbers) {
