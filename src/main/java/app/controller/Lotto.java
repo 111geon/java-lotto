@@ -27,7 +27,11 @@ public class Lotto {
     }
 
     private void showLotteryTickets() {
-        Viewer.printLotteryTickets(lotteryTickets);
+        Viewer.printLotteryTickets(
+                lotteryTickets.getNumManualTickets(),
+                lotteryTickets.getNumAutoTickets(),
+                lotteryTickets.getNumbersList()
+        );
     }
 
     private void setWinningNumbers() {
@@ -38,6 +42,6 @@ public class Lotto {
 
     private void showResult() {
         Winners winners = lotteryTickets.getWinnersFrom(winningNumbers);
-        Viewer.printStatistics(winners);
+        Viewer.printStatistics(winners.getEntrySet(), winners.calculateProfitRate());
     }
 }
